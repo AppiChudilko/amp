@@ -10,7 +10,7 @@ namespace NativeUI
     /// <summary>
     /// A Text object in the 1080 pixels height base system.
     /// </summary>
-    public class UIResText : GTA.UI.Text
+    public class UIResText : TextElement
     {
         public UIResText(string caption, Point position, float scale) : base(caption, position, scale)
         {
@@ -107,7 +107,7 @@ namespace NativeUI
                 thisCol.Call(Hash.SET_TEXT_WRAP, x, xsize);
             }
 
-            thisCol.Call(Hash._SET_TEXT_ENTRY, "jamyfafi");
+            thisCol.Call(Hash.BEGIN_TEXT_COMMAND_DISPLAY_TEXT, "jamyfafi");
             //AddLongString(Caption);
 
             const int maxStringLength = 99;
@@ -118,7 +118,7 @@ namespace NativeUI
             }
 
 
-            thisCol.Call(Hash._DRAW_TEXT, x, y);
+            thisCol.Call(Hash.END_TEXT_COMMAND_DISPLAY_TEXT, x, y);
             thisCol.Execute();
         }
 

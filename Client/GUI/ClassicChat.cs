@@ -28,7 +28,7 @@ namespace GTANetwork.GUI
 			    var count = JavascriptHook.TextElements.Count;
 			    for (var i = 0; i < count; i++)
 			    {
-			        JavascriptHook.TextElements[i].Draw();
+			        JavascriptHook.TextElements[i].Draw(new Size());
 			    }
 			};
 		}
@@ -172,6 +172,7 @@ namespace GTANetwork.GUI
             float realSize = UIResText.MeasureStringWidth(CurrentInput ?? "", Font.ChaletLondon, 0.35f);
 
             //realSize /= 0.35f;
+            
 
             _inputboxBorderRectangle.Size = new SizeF(Math.Max(600 + borderWidth * 2, borderWidth*2 + realSize + 20),
                                             35 + borderWidth*2);
@@ -253,8 +254,8 @@ namespace GTANetwork.GUI
 
             DrawChatboxInput();
 
-            Game.DisableControlThisFrame(0, Control.NextCamera);
-            Game.DisableAllControlsThisFrame(0);
+            Game.DisableControlThisFrame(Control.NextCamera);
+            Game.DisableAllControlsThisFrame();
         }
 
         public void AddMessage(string sender, string msg)

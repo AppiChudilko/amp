@@ -45,17 +45,7 @@ namespace GTA
 	void Log(String ^logLevel, ... array<String ^> ^message)
 	{
 		DateTime now = DateTime::Now;
-
-		//HKEY hKey;
-		//std::wstring strValueOfBinDir;
-		//RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\WOW6432Node\\Rockstar Games\\Grand Theft Auto V", 0, KEY_READ, &hKey);
-		//GetStringRegKey(hKey, L"GTANetworkInstallDir", strValueOfBinDir, L"bad");
-		//String^ str = gcnew String(strValueOfBinDir.c_str());
-
-		////String ^logpath = IO::Path::ChangeExtension(Assembly::GetExecutingAssembly()->Location, ".log");
 		String ^logpath = IO::Path::Combine(IO::Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "..\\logs\\ScriptHookVDotNet.log");
-        //String ^logpath = IO::Path::Combine(IO::Path::GetDirectoryName(str),"logs\\ScriptHookVDotNet.log");
-
 		logpath = logpath->Insert(logpath->IndexOf(".log"), "-" + now.ToString("yyyy-MM-dd"));
 
 		try
@@ -148,8 +138,13 @@ namespace GTA
 
 		ScriptDomain ^scriptdomain = nullptr;
 
+		Log("[DEBUG]", ScriptDomain::typeid->Assembly->Location);
+		Log("[DEBUG]", ScriptDomain::typeid->FullName);
+		Log("[DEBUG]", path);
+
 		try
 		{
+			Log("[DEBUG]", (appdomain->CreateInstanceFromAndUnwrap(ScriptDomain::typeid->Assembly->Location, ScriptDomain::typeid->FullName)->GetType()->ToString()));
 			scriptdomain = static_cast<ScriptDomain ^>(appdomain->CreateInstanceFromAndUnwrap(ScriptDomain::typeid->Assembly->Location, ScriptDomain::typeid->FullName));
 		}
 		catch (Exception ^ex)

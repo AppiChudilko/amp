@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using GTA;
-using Font = GTA.Font;
+using Font = GTA.UI.Font;
 
 namespace NativeUI
 {

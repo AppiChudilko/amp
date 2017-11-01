@@ -242,13 +242,13 @@ namespace GTANetwork.Sync
 
             thisCollection.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, Braking);
 
-            if (MainVehicle.SirenActive && !Siren)
+            if (MainVehicle.IsSirenActive && !Siren)
             {
-                MainVehicle.SirenActive = Siren;
+                MainVehicle.IsSirenActive = Siren;
             }
-            else if (!MainVehicle.SirenActive && Siren)
+            else if (!MainVehicle.IsSirenActive && Siren)
             {
-                MainVehicle.SirenActive = Siren;
+                MainVehicle.IsSirenActive = Siren;
             }
             
             /*if (MainVehicle.IsConvertible && !IsConvertible)
@@ -513,7 +513,7 @@ namespace GTANetwork.Sync
 
                 if (!IsShooting && !IsAiming && _lastDrivebyShooting && Game.GameTime - _lastVehicleAimUpdate > 200)
                 {
-                    Tasks task = Character.Task;
+                    var task = Character.Task;
                     task.ClearAll();
                     task.ClearSecondary();
                     Function.Call(Hash.CLEAR_DRIVEBY_TASK_UNDERNEATH_DRIVING_TASK, Character);

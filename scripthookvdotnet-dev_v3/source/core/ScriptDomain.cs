@@ -29,7 +29,12 @@ namespace GTA
 		void Run();
 	}
 
-	internal class ScriptDomain : MarshalByRefObject, IDisposable
+    public static class ObjectExtensions
+    {
+        public static T StaticCast<T>(this T o) => o;
+    }
+
+    internal class ScriptDomain : MarshalByRefObject, IDisposable
 	{
 		#region Fields
 		private int _executingThreadId;
@@ -43,26 +48,26 @@ namespace GTA
 		private bool disposed = false;
 		#endregion
 
-		public ScriptDomain()
-		{
-			AppDomain = AppDomain.CurrentDomain;
-			AppDomain.AssemblyResolve += new ResolveEventHandler(HandleResolve);
-			AppDomain.UnhandledException += new UnhandledExceptionEventHandler(HandleUnhandledException);
+        public ScriptDomain()
+        {
+	        AppDomain = AppDomain.CurrentDomain;
+	        AppDomain.AssemblyResolve += new ResolveEventHandler(HandleResolve);
+	        AppDomain.UnhandledException += new UnhandledExceptionEventHandler(HandleUnhandledException);
 
-			CurrentDomain = this;
+            CurrentDomain = this;
 
-			_executingThreadId = Thread.CurrentThread.ManagedThreadId;
+	        _executingThreadId = Thread.CurrentThread.ManagedThreadId;
 
-			Log("[INFO]", "Created new script domain with v", typeof(ScriptDomain).Assembly.GetName().Version.ToString(3), ".");
+	        Log("[INFO]", "Created new script domain with v", typeof(ScriptDomain).Assembly.GetName().Version.ToString(3), ".");
 
-			Console = new ConsoleScript();
-		}
+	        Console = new ConsoleScript();
+        }
 		~ScriptDomain()
 		{
 			Dispose(false);
 		}
-
-		public void Dispose()
+        
+          public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
@@ -84,117 +89,115 @@ namespace GTA
 		public ConsoleScript Console { get; private set; }
 		public Script[] RunningScripts => _runningScripts.ToArray();
 
-		public static ScriptDomain Load(string path)
-		{
-			if (!Path.IsPathRooted(path))
-			{
-				path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), path);
-			}
+        public static ScriptDomain Load(string path)
+        {
+            if (!Path.IsPathRooted(path))
+            {
+                path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), path);
+            }
 
-			path = Path.GetFullPath(path);
+            path = Path.GetFullPath(path);
 
-			// Clear log
-			string logPath = Path.ChangeExtension(Assembly.GetExecutingAssembly().Location, ".log");
+            // Create AppDomain
+            var setup = new AppDomainSetup();
+	        setup.ApplicationBase = path;
+	        setup.ShadowCopyFiles = "true";
+	        setup.ShadowCopyDirectories = path;
 
-			try
-			{
-				File.WriteAllText(logPath, string.Empty);
-			}
-			catch
-			{
-			}
+	        var appdomain = AppDomain.CreateDomain("ScriptDomain_" + (path.GetHashCode() * Environment.TickCount).ToString("X"), null, setup, new System.Security.PermissionSet(System.Security.Permissions.PermissionState.Unrestricted));
+	        appdomain.InitializeLifetimeService();
 
-			// Create AppDomain
-			var setup = new AppDomainSetup();
-			setup.ApplicationBase = path;
-			setup.ShadowCopyFiles = "true";
-			setup.ShadowCopyDirectories = path;
+            Log("[DEBUG]", "Path ", path);
+            Log("[DEBUG]", "Location ", typeof(ScriptDomain).Assembly.Location);
+            Log("[DEBUG]", "FullName ", typeof(ScriptDomain).FullName);
+            
+            ScriptDomain scriptdomain = null;
 
-			var appdomain = AppDomain.CreateDomain("ScriptDomain_" + (path.GetHashCode() * Environment.TickCount).ToString("X"), null, setup, new System.Security.PermissionSet(System.Security.Permissions.PermissionState.Unrestricted));
-			appdomain.InitializeLifetimeService();
+            try
+            {
+                //scriptdomain = (ScriptDomain) appdomain.CreateInstanceFromAndUnwrap(typeof(ScriptDomain).Assembly.Location, typeof(ScriptDomain).FullName);
 
-			ScriptDomain scriptdomain = null;
+                var obj = appdomain.CreateInstance(typeof(ScriptDomain).Assembly.Location, typeof(ScriptDomain).FullName);
+                scriptdomain = (ScriptDomain) obj.Unwrap();
+                
+                //scriptdomain = (ScriptDomain)(appdomain.CreateInstance(typeof(ScriptDomain).Assembly.Location, typeof(ScriptDomain).FullName).Unwrap());
+            }
+            catch (Exception ex)
+	        {
+		        Log("[ERROR]", "Failed to create script domain':", Environment.NewLine, ex.ToString());
 
-			try
-			{
-				scriptdomain = (ScriptDomain)(appdomain.CreateInstanceFromAndUnwrap(typeof(ScriptDomain).Assembly.Location, typeof(ScriptDomain).FullName));
-			}
-			catch (Exception ex)
-			{
-				Log("[ERROR]", "Failed to create script domain':", Environment.NewLine, ex.ToString());
+		        AppDomain.Unload(appdomain);
 
-				AppDomain.Unload(appdomain);
+		        return null;
+	        }
 
-				return null;
-			}
+	        Log("[INFO]", "Loading scripts from '", path, "' ...");
 
-			Log("[INFO]", "Loading scripts from '", path, "' ...");
+	        if (Directory.Exists(path))
+	        {
+		        var filenameScripts = new List<string>();
+		        var filenameAssemblies = new List<string>();
 
-			if (Directory.Exists(path))
-			{
-				var filenameScripts = new List<string>();
-				var filenameAssemblies = new List<string>();
+		        try
+		        {
+			        filenameScripts.AddRange(Directory.GetFiles(path, "*.vb", SearchOption.AllDirectories));
+			        filenameScripts.AddRange(Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories));
+			        filenameAssemblies.AddRange(Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories));
+		        }
+		        catch (Exception ex)
+		        {
+			        Log("[ERROR]", "Failed to reload scripts:", Environment.NewLine, ex.ToString());
 
-				try
-				{
-					filenameScripts.AddRange(Directory.GetFiles(path, "*.vb", SearchOption.AllDirectories));
-					filenameScripts.AddRange(Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories));
-					filenameAssemblies.AddRange(Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories));
-				}
-				catch (Exception ex)
-				{
-					Log("[ERROR]", "Failed to reload scripts:", Environment.NewLine, ex.ToString());
+			        AppDomain.Unload(appdomain);
 
-					AppDomain.Unload(appdomain);
+			        return null;
+		        }
 
-					return null;
-				}
+		        for (int i = 0; i < filenameAssemblies.Count; i++)
+		        {
+			        var filename = filenameAssemblies[i];
+			        var assemblyName = AssemblyName.GetAssemblyName(filename);
 
-				for (int i = 0; i < filenameAssemblies.Count; i++)
-				{
-					var filename = filenameAssemblies[i];
-					var assemblyName = AssemblyName.GetAssemblyName(filename);
+			        try
+			        {
+				        if (assemblyName.Name.StartsWith("ScriptHookVDotNet", StringComparison.OrdinalIgnoreCase))
+				        {
+					        Log("[WARNING]", "Removing assembly file '", Path.GetFileName(filename), "'.");
 
-					try
-					{
-						if (AssemblyName.GetAssemblyName(filename).Name.StartsWith("ScriptHookVDotNet", StringComparison.OrdinalIgnoreCase))
-						{
-							Log("[WARNING]", "Removing assembly file '", Path.GetFileName(filename), "'.");
+					        filenameAssemblies.RemoveAt(i--);
 
-							filenameAssemblies.RemoveAt(i--);
+					        try
+					        {
+						        File.Delete(filename);
+					        }
+					        catch (Exception ex)
+					        {
+						        Log("[ERROR]", "Failed to delete assembly file:", Environment.NewLine, ex.ToString());
+					        }
+				        }
+			        }
+			        catch (Exception ex)
+			        {
+				        Log("[ERROR]", "Failed to load assembly file '", Path.GetFileName(filename), "':", Environment.NewLine, ex.ToString());
+			        }
+		        }
 
-							try
-							{
-								File.Delete(filename);
-							}
-							catch (Exception ex)
-							{
-								Log("[ERROR]", "Failed to delete assembly file:", Environment.NewLine, ex.ToString());
-							}
-						}
-					}
-					catch (Exception ex)
-					{
-						Log("[ERROR]", "Failed to load assembly file '", Path.GetFileName(filename), "':", Environment.NewLine, ex.ToString());
-					}
-				}
+		        foreach (string filename in filenameScripts)
+		        {
+			        scriptdomain.LoadScript(filename);
+		        }
+		        foreach (string filename in filenameAssemblies)
+		        {
+			        scriptdomain.LoadAssembly(filename);
+		        }
+	        }
+	        else
+	        {
+		        Log("[ERROR]", "Failed to reload scripts because the directory is missing.");
+	        }
 
-				foreach (string filename in filenameScripts)
-				{
-					scriptdomain.LoadScript(filename);
-				}
-				foreach (string filename in filenameAssemblies)
-				{
-					scriptdomain.LoadAssembly(filename);
-				}
-			}
-			else
-			{
-				Log("[ERROR]", "Failed to reload scripts because the directory is missing.");
-			}
-
-			return scriptdomain;
-		}
+	        return scriptdomain;
+        }
 
 		private bool LoadScript(string filename)
 		{
@@ -767,11 +770,13 @@ namespace GTA
 		static private void Log(string logLevel, params string[] message)
 		{
 			var datetime = DateTime.Now;
-			string logPath = Path.ChangeExtension(Assembly.GetExecutingAssembly().Location, ".log");
+            //string logPath = Path.ChangeExtension(Assembly.GetExecutingAssembly().Location, ".log");
+            string logPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..\\logs\\ScriptHookVDotNet.log");
+            logPath = logPath.Insert(logPath.IndexOf(".log"), "-" + datetime.ToString("yyyy-MM-dd"));
 
-			try
+            try
 			{
-				var fs = new FileStream(logPath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                var fs = new FileStream(logPath, FileMode.Append, FileAccess.Write, FileShare.Read);
 				var sw = new StreamWriter(fs);
 
 				try

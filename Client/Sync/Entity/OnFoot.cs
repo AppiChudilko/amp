@@ -376,7 +376,7 @@ namespace GTANetwork.Sync
                     var ray = World.RaycastCapsule(start, end, (int)Math.Abs(end.X - start.X),
                         IntersectOptions.Peds1, Character);
                     //Function.Call(Hash.DRAW_LINE, start.X, start.Y, start.Z, end.X, end.Y, end.Z, 255, 255, 255, 255);
-                    if (ray.DitHit && ray.DitHitEntity &&
+                    if (ray.DidHit && ray.DidHitEntity &&
                         ray.HitEntity.Handle == PlayerChar.Handle)
                     {
                         LocalHandle them = new LocalHandle(Character.Handle, HandleType.GameHandle);
@@ -396,7 +396,7 @@ namespace GTANetwork.Sync
                 var start = rightfist - new Vector3(0, 0, 0.5f);
                 var end = rightfist + new Vector3(0, 0, 0.5f);
                 var ray = World.RaycastCapsule(start, end, (int)Math.Abs(end.X - start.X), IntersectOptions.Peds1, Character);
-                if (ray.DitHit && ray.DitHitEntity && ray.HitEntity.Handle == PlayerChar.Handle)
+                if (ray.DidHit && ray.DidHitEntity && ray.HitEntity.Handle == PlayerChar.Handle)
                 {
                     LocalHandle them = new LocalHandle(Character.Handle, HandleType.GameHandle);
                     JavascriptHook.InvokeCustomEvent(api =>
@@ -805,8 +805,8 @@ namespace GTANetwork.Sync
                 _parachuteProp.IsPositionFrozen = true;
                 Function.Call(Hash.SET_ENTITY_COLLISION, _parachuteProp.Handle, false, 0);
 
-                _parachuteProp.AttachTo(Character, Character.GetBoneIndex(Bone.SKEL_Spine2), new Vector3(3.6f, 0, 0f), new Vector3(0, 90, 0));
-
+                _parachuteProp.AttachTo(Character.Bones["SKEL_Spine2"], new Vector3(3.6f, 0, 0f), new Vector3(0, 90, 0));
+  
                 Character.Task.ClearAllImmediately();
                 Character.Task.ClearSecondary();
             }

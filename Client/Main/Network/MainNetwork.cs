@@ -143,7 +143,7 @@ namespace GTANetwork
                     else
                     {
                         MainMenu.TemporarilyHidden = true;
-                        obj.Password = Game.GetUserInput(256);
+                        obj.Password = Game.GetUserInput("");
                         MainMenu.TemporarilyHidden = false;
                     }
                 }
@@ -160,7 +160,7 @@ namespace GTANetwork
                 }
                 catch (NetException ex)
                 {
-                    GTA.UI.Screen.ShowNotification("~b~~h~AMP~h~~w~~n~" + ex.Message);
+                    GTA.UI.Notification.Show("~b~~h~AMP~h~~w~~n~" + ex.Message);
                     OnLocalDisconnect();
                     return;
                 }
@@ -282,7 +282,7 @@ namespace GTANetwork
 
                 if (_serverProcess != null)
                 {
-                    GTA.UI.Screen.ShowNotification("~b~~h~AMP~h~~w~~n~Shutting down server...");
+                    GTA.UI.Notification.Show("~b~~h~AMP~h~~w~~n~Shutting down server...");
                     _serverProcess.Kill();
                     _serverProcess.Dispose();
                     _serverProcess = null;

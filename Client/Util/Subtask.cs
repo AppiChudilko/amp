@@ -42,7 +42,7 @@ namespace GTANetwork.Util
                 }
             }
 
-            new UIResText(sb.ToString(), new Point(10, 10), 0.3f).Draw();
+            new UIResText(sb.ToString(), new Point(10, 10), 0.3f).Draw(new Size());
         }
     }
 

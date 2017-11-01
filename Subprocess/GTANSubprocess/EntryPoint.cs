@@ -395,7 +395,7 @@ namespace GTANetwork
                     MoveFile(file, settings.GamePath + "\\" + "Disabled" + "\\" + Path.GetFileName(file));
                 }
 
-                string[] Files = { "ClearScript.dll", "ClearScriptV8-32.dll", "ClearScriptV8-64.dll", "EasyHook64.dll", "scripthookv.dll", "ScriptHookVDotNet.dll", "v8-ia32.dll", "dinput8.dll" };
+                string[] Files = { "ClearScript.dll", "ClearScriptV8-32.dll", "ClearScriptV8-64.dll", "EasyHook64.dll", "scripthookv.dll", "ScriptHookVDotNet.dll", "ScriptHookVDotNet.asi", "v8-ia32.dll", "dinput8.dll" };
                 foreach (var file in Files)
                 {
                     if (!File.Exists(settings.GamePath + "\\" + file)) continue;
@@ -751,6 +751,7 @@ namespace GTANetwork
         public static void InjectOurselves(Process gta)
         {
             Inject(gta, GTANFolder + "bin" + "\\" + "scripthookv.dll");
+            //Inject(gta, GTANFolder + "bin" + "\\" + "ScriptHookVDotNet.asi");
             Inject(gta, GTANFolder + "bin" + "\\" + "ScriptHookVDotNet.dll");
             Inject(gta, GTANFolder + "bin" + "\\" + "sharpdx_direct3d11_effects_x64.dll");
             Inject(gta, GTANFolder + "bin" + "\\" + "dinput8.dll");

@@ -24,18 +24,17 @@ namespace GTANetwork
     public class PrintVersionThread : Script
     {
         //static UIResText _versionLabel = new UIResText("AMP " + Main.CurrentVersion + "-" + Main.PlayerSettings.UpdateChannel, new Point(), 0.35f, Color.FromArgb(100, 200, 200, 200));
-        private static readonly UIResText VersionLabel = new UIResText("AMP " + Main.CurrentVersion + "-BETA", new Point(), 0.35f, Color.FromArgb(100, 200, 200, 200));
+        private static readonly UIResText VersionLabel = new UIResText("AMP " + Main.CurrentVersion + "-BETA", new Point((int)(Main.res.Width / 2), 0), 0.35f, Color.FromArgb(100, 200, 200, 200));
 
         public PrintVersionThread()
         {
             Tick += OnTick;
-            VersionLabel.Position = new Point((int)(Main.res.Width / 2), 0);
             VersionLabel.TextAlignment = UIResText.Alignment.Centered;
         }
 
         private static void OnTick(object sender, EventArgs e)
         {
-            if (Main.IsConnected()) VersionLabel.Draw();
+            if (Main.IsConnected()) VersionLabel.Draw(new Size());
         }
     }
 
@@ -189,8 +188,8 @@ namespace GTANetwork
             }
             catch (Exception ex)
             {
-                GTA.UI.Screen.ShowNotification("FATAL ERROR WHEN PARSING MAP");
-                GTA.UI.Screen.ShowNotification(ex.Message);
+                GTA.UI.Notification.Show("FATAL ERROR WHEN PARSING MAP");
+                GTA.UI.Notification.Show(ex.Message);
                 Client.Disconnect("Map Parse Error");
 
                 LogManager.LogException(ex, "MAP PARSE");
@@ -198,7 +197,7 @@ namespace GTANetwork
                 return;
             }
 
-            World.CurrentDayTime = new TimeSpan(map.World.Hours, map.World.Minutes, 00);
+            World.CurrentTimeOfDay = new TimeSpan(map.World.Hours, map.World.Minutes, 00);
 
             Time = new TimeSpan(map.World.Hours, map.World.Minutes, 00);
             if (map.World.Weather >= 0 && map.World.Weather < Enums._weather.Length)
@@ -324,7 +323,7 @@ namespace GTANetwork
             }
             if (Function.Call<bool>(Hash.IS_PED_WALKING, ped)) output = 1;
             if (Function.Call<bool>(Hash.IS_PED_RUNNING, ped)) output = 2;
-            if (Function.Call<bool>(Hash.IS_PED_SPRINTING, ped) || ped.IsPlayer && Game.IsControlPressed(0, Control.Sprint)) output = 3;
+            if (Function.Call<bool>(Hash.IS_PED_SPRINTING, ped) || ped.IsPlayer && Game.IsControlPressed(Control.Sprint)) output = 3;
 
             //if (Function.Call<bool>(Hash.IS_PED_STRAFING, ped)) ;
 
@@ -521,7 +520,7 @@ namespace GTANetwork
                 (IntersectOptions)(1 | 16 | 256 | 2 | 4 | 8)// | peds + vehicles
                 , ignoreEntity);
 
-            if (raycastResults.DitHit)
+            if (raycastResults.DidHit)
             {
                 return raycastResults.HitPosition;
             }
@@ -552,7 +551,7 @@ namespace GTANetwork
                 (IntersectOptions)(1 | 16 | 256 | 2 | 4 | 8)// | peds + vehicles
                 , ignoreEntity);
 
-            if (raycastResults.DitHit)
+            if (raycastResults.DidHit)
             {
                 return raycastResults.HitPosition;
             }
@@ -565,7 +564,7 @@ namespace GTANetwork
             var num1 = new OutputArgument();
             var num2 = new OutputArgument();
 
-            if (!Function.Call<bool>(Hash._WORLD3D_TO_SCREEN2D, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
+            if (!Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
             {
                 screenCoords = new Vector2();
                 return false;
@@ -579,7 +578,7 @@ namespace GTANetwork
             var num1 = new OutputArgument();
             var num2 = new OutputArgument();
 
-            if (!Function.Call<bool>(Hash._WORLD3D_TO_SCREEN2D, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
+            if (!Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
             {
                 return new PointF();
             }

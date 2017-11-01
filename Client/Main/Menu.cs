@@ -526,13 +526,13 @@ namespace GTANetwork
                 _connectTab.DrawInstructionalButtons += (sender, args) =>
                 {
                     MainMenu.DrawInstructionalButton(4, Control.Jump, "Refresh");
-                    if (Game.IsControlJustPressed(0, Control.Jump)) RebuildServerBrowser();
+                    if (Game.IsControlJustPressed(Control.Jump)) RebuildServerBrowser();
 
                     #region Tabs
                     if (_connectTab.Index == (int)Tab.Verified && _connectTab.Items[(int)Tab.Verified].Focused || _connectTab.Index == (int)Tab.Internet && _connectTab.Items[(int)Tab.Internet].Focused || _connectTab.Index == (int)Tab.LAN && _connectTab.Items[(int)Tab.LAN].Focused || _connectTab.Index == (int)Tab.Recent && _connectTab.Items[(int)Tab.Recent].Focused)
                     {
                         MainMenu.DrawInstructionalButton(6, Control.NextCamera, "Sort by Players");
-                        if (Game.IsControlJustPressed(0, Control.NextCamera))
+                        if (Game.IsControlJustPressed(Control.NextCamera))
                         {
                            ListSorting = !ListSorting;
                            RebuildServerBrowser();
@@ -540,7 +540,7 @@ namespace GTANetwork
 
 
                         MainMenu.DrawInstructionalButton(5, Control.Enter, "Add to Favorites");
-                        if (Game.IsControlJustPressed(0, Control.Enter))
+                        if (Game.IsControlJustPressed(Control.Enter))
                         {
                             _favBrowser.RefreshIndex();
                             var selectedServer = _serverBrowser.Items[_serverBrowser.Index];
@@ -617,7 +617,7 @@ namespace GTANetwork
                         MainMenu.DrawInstructionalButton(6, Control.NextCamera, "Add Server");
 
                         #region Add server
-                        if (Game.IsControlJustPressed(0, Control.NextCamera))
+                        if (Game.IsControlJustPressed(Control.NextCamera))
                         {
 
                             MainMenu.TemporarilyHidden = true;
@@ -652,7 +652,7 @@ namespace GTANetwork
                         MainMenu.DrawInstructionalButton(5, Control.Enter, "Remove");
 
                         #region Remove
-                        if (Game.IsControlJustPressed(0, Control.Enter))
+                        if (Game.IsControlJustPressed(Control.Enter))
                         {
                             var selectedServer = _favBrowser.Items[_favBrowser.Index];
                             var favItem = _favBrowser.Items.FirstOrDefault(i => i.Description == selectedServer.Description);
@@ -697,7 +697,7 @@ namespace GTANetwork
                     {
                         if (IsOnServer())
                         {
-                            GTA.UI.Screen.ShowNotification("You cannot change your Display Name while connected to a server.");
+                            GTA.UI.Notification.Show("You cannot change your Display Name while connected to a server.");
                             return;
                         }
                         MainMenu.TemporarilyHidden = true;
@@ -1266,7 +1266,7 @@ namespace GTANetwork
 
         private void PauseMenu()
         {
-            if (Game.IsControlJustPressed(0, Control.FrontendPauseAlternate) && !MainMenu.Visible && !_wasTyping && !_mainWarning.Visible)
+            if (Game.IsControlJustPressed(Control.FrontendPauseAlternate) && !MainMenu.Visible && !_wasTyping && !_mainWarning.Visible)
             {
                 MainMenu.Visible = true;
 
@@ -1297,7 +1297,7 @@ namespace GTANetwork
                 }
                 if (!IsOnServer())
                 {
-                    Game.EnableControlThisFrame(0, Control.FrontendPause);
+                    Game.EnableControlThisFrame(Control.FrontendPause);
                 }
 
                 double aver;

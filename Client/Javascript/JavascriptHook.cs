@@ -833,7 +833,7 @@ namespace GTANetwork.Javascript
             }
         }
 
-        public void pointCameraAtEntityBone(GlobalCamera cam, LocalHandle ent, int bone, Vector3 offset)
+        /*public void pointCameraAtEntityBone(GlobalCamera cam, LocalHandle ent, int bone, Vector3 offset)
         {
             cam.VectorPointing = null;
             cam.EntityPointing = ent.Value;
@@ -845,7 +845,7 @@ namespace GTANetwork.Javascript
             {
                 cam.CamObj.PointAt(new Ped(ent.Value), bone, offset.ToVector());
             }
-        }
+        }*/
 
         public void stopCameraPointing(GlobalCamera cam)
         {
@@ -872,7 +872,7 @@ namespace GTANetwork.Javascript
             }
         }
 
-        public void attachCameraToEntityBone(GlobalCamera cam, LocalHandle ent, int bone, Vector3 offset)
+        /*public void attachCameraToEntityBone(GlobalCamera cam, LocalHandle ent, int bone, Vector3 offset)
         {
             cam.EntityAttached = ent.Value;
             cam.BoneAttached = bone;
@@ -882,7 +882,7 @@ namespace GTANetwork.Javascript
             {
                 cam.CamObj.AttachTo(new Ped(ent.Value), bone, offset.ToVector());
             }
-        }
+        }*/
 
         public void detachCamera(GlobalCamera cam)
         {
@@ -992,9 +992,9 @@ namespace GTANetwork.Javascript
 
             private RaycastResult wrapper;
 
-            public bool didHitAnything => wrapper.DitHit;
+            public bool didHitAnything => wrapper.DidHit;
 
-            public bool didHitEntity => wrapper.DitHitEntity;
+            public bool didHitEntity => wrapper.DidHitEntity;
 
             public LocalHandle hitEntity => new LocalHandle(wrapper.HitEntity?.Handle ?? 0);
 
@@ -1529,7 +1529,7 @@ namespace GTANetwork.Javascript
         public void createParticleEffectOnPosition(string ptfxLibrary, string ptfxName, Vector3 position, Vector3 rotation, double scale)
         {
             Util.Util.LoadPtfxAsset(ptfxLibrary);
-            Function.Call(Hash._SET_PTFX_ASSET_NEXT_CALL, ptfxLibrary);
+            Function.Call(Hash._USE_PARTICLE_FX_ASSET_NEXT_CALL, ptfxLibrary);
             Function.Call((Hash) 0x25129531F77B9ED3, ptfxName, position.X, position.Y, position.Z, rotation.X,
                 rotation.Y, rotation.Z,
                 (float)scale, 0, 0, 0);
@@ -1538,7 +1538,7 @@ namespace GTANetwork.Javascript
         public void createParticleEffectOnEntity(string ptfxLibrary, string ptfxName, LocalHandle entity, Vector3 offset, Vector3 rotation, double scale, int boneIndex = -1)
         {
             Util.Util.LoadPtfxAsset(ptfxLibrary);
-            Function.Call(Hash._SET_PTFX_ASSET_NEXT_CALL, ptfxLibrary);
+            Function.Call(Hash._USE_PARTICLE_FX_ASSET_NEXT_CALL, ptfxLibrary);
 
             if (boneIndex <= 0)
             {
@@ -1636,7 +1636,7 @@ namespace GTANetwork.Javascript
             var veh = vehicle.Properties<RemoteVehicle>();
 
             if (veh == null) return false;
-            return veh.StreamedIn ? new Vehicle(vehicle.Value).SirenActive : veh.Siren;
+            return veh.StreamedIn ? new Vehicle(vehicle.Value).IsSirenActive : veh.Siren;
         }
 
         public bool isVehicleTyrePopped(LocalHandle vehicle, int tyre)
@@ -1837,8 +1837,8 @@ namespace GTANetwork.Javascript
             if (veh == null) return;
             if (veh.StreamedIn)
             {
-                new Vehicle(vehicle.Value).TaxiLightOn = status;
-                new Vehicle(vehicle.Value).SearchLightOn = status;
+                new Vehicle(vehicle.Value).IsTaxiLightOn = status;
+                new Vehicle(vehicle.Value).IsSearchLightOn = status;
             }
 
             if (status)
@@ -2132,7 +2132,7 @@ namespace GTANetwork.Javascript
 
         public float getVehicleMaxOccupants(int model)
         {
-            return Function.Call<int>(Hash._GET_VEHICLE_MODEL_MAX_NUMBER_OF_PASSENGERS, model);
+            return Function.Call<int>(Hash.GET_VEHICLE_MODEL_NUMBER_OF_SEATS, model);
         }
 
         public int getVehicleClass(int model)
@@ -2412,9 +2412,11 @@ namespace GTANetwork.Javascript
                 .WeaponTints[weapon];
         }
 
-        public void givePlayerWeaponComponent(int weapon, int component)
+        /*public void givePlayerWeaponComponent(int weapon, int component)
         {
-            Game.Player.Character.Weapons[(GTA.WeaponHash)weapon].SetComponent((WeaponComponent) component, true);
+            //Game.Player.Character.Weapons[(GTA.WeaponHash)weapon].SetComponent((WeaponComponent) component, true);
+            //var test = Game.Player.Character.Weapons[(GTA.WeaponHash) weapon];
+
         }
 
         public void removePlayerWeaponComponent(int weapon, int component)
@@ -2685,7 +2687,7 @@ namespace GTANetwork.Javascript
                         WeaponComponent.RevolverVarmodGoon,
                     };
             }
-        }
+        }*/
 
         public int getPlayerCurrentWeapon()
         {
@@ -3625,7 +3627,7 @@ namespace GTANetwork.Javascript
             }
 
             //Function.Call(Hash._SET_TEXT_ENTRY, "CELL_EMAIL_BCON");
-            Function.Call(Hash._SET_TEXT_ENTRY, new InputArgument(Main.StringCache.GetCached("CELL_EMAIL_BCON")));
+            Function.Call(Hash.BEGIN_TEXT_COMMAND_DISPLAY_TEXT, new InputArgument(Main.StringCache.GetCached("CELL_EMAIL_BCON")));
             //NativeUI.UIResText.AddLongString(caption);
 
             const int maxStringLength = 99;
@@ -3639,7 +3641,7 @@ namespace GTANetwork.Javascript
                 Function.Call((Hash)0x6C188BE134E074AA, caption.Substring(i, System.Math.Min(maxStringLength, caption.Length - i)));
             }
 
-            Function.Call(Hash._DRAW_TEXT, x, y);
+            Function.Call(Hash.END_TEXT_COMMAND_DISPLAY_TEXT, x, y);
         }
 
         public UIResText addTextElement(string caption, double x, double y, double scale, int r, int g, int b, int a, int font, int alignment)
@@ -4059,11 +4061,11 @@ namespace GTANetwork.Javascript
             menu.Draw();
 
             if (!menu.Visible) return;
-            Game.DisableControlThisFrame(0, Control.NextCamera);
-            Game.DisableControlThisFrame(0, Control.NextWeapon);
-            Game.DisableControlThisFrame(0, Control.VehicleNextRadio);
-            Game.DisableControlThisFrame(0, Control.LookLeftRight);
-            Game.DisableControlThisFrame(0, Control.LookUpDown);
+            Game.DisableControlThisFrame(Control.NextCamera);
+            Game.DisableControlThisFrame(Control.NextWeapon);
+            Game.DisableControlThisFrame(Control.VehicleNextRadio);
+            Game.DisableControlThisFrame(Control.LookLeftRight);
+            Game.DisableControlThisFrame(Control.LookUpDown);
         }
 
         public void setMenuBannerSprite(UIMenu menu, string spritedict, string spritename)
@@ -4082,7 +4084,7 @@ namespace GTANetwork.Javascript
             menu.SetBannerType(new UIResRectangle(new Point(), new Size(), Color.FromArgb(alpha, red, green, blue)));
         }
 
-        public void setMenuTitle(UIMenu menu, string title)
+        /*public void setMenuTitle(UIMenu menu, string title)
         {
             menu.Title.Caption = title;
         }
@@ -4090,11 +4092,11 @@ namespace GTANetwork.Javascript
         public void setMenuSubtitle(UIMenu menu, string text)
         {
             menu.Subtitle.Caption = text;
-        }
+        }*/
 
-        public string getUserInput(string defaultText, int maxlen)
+        public string getUserInput(string defaultText)
         {
-            return Game.GetUserInput(defaultText, maxlen);
+            return Game.GetUserInput(defaultText);
         }
 
         internal PointF convertAnchorPos(float x, float y, Anchor anchor, float xOffset, float yOffset)
@@ -4161,62 +4163,64 @@ namespace GTANetwork.Javascript
 
         public bool isControlJustPressed(int control)
         {
-            return Game.IsControlJustPressed(0, (GTA.Control) control);
+            return Game.IsControlJustPressed((GTA.Control) control);
         }
 
         public bool isControlPressed(int control)
         {
-            return Game.IsControlPressed(0, (GTA.Control)control);
+            return Game.IsControlPressed((GTA.Control)control);
         }
 
         public bool isDisabledControlJustReleased(int control)
         {
-            return Game.IsDisabledControlJustReleased(0, (GTA.Control)control);
+            //return Game.IsDisabledControlJustReleased(0, (GTA.Control)control);
+            return !Game.IsEnabledControlJustReleased((GTA.Control)control);
         }
 
         public bool isDisabledControlJustPressed(int control)
         {
-            return Game.IsDisabledControlJustPressed(0, (GTA.Control)control);
+            //return Game.IsDisabledControlJustPressed(0, (GTA.Control)control);
+            return !Game.IsEnabledControlJustPressed((GTA.Control)control);
         }
 
         public bool isDisabledControlPressed(int control)
         {
-            return Game.IsControlPressed(0, (GTA.Control)control);
+            return Game.IsControlPressed((GTA.Control)control);
         }
 
         public bool isControlJustReleased(int control)
         {
-            return Game.IsControlJustReleased(0, (GTA.Control)control);
+            return Game.IsControlJustReleased((GTA.Control)control);
         }
 
         public void disableControlThisFrame(int control)
         {
-            Game.DisableControlThisFrame(0, (GTA.Control)control);
+            Game.DisableControlThisFrame((GTA.Control)control);
         }
 
         public void enableControlThisFrame(int control)
         {
-            Game.EnableControlThisFrame(0, (GTA.Control)control);
+            Game.EnableControlThisFrame((GTA.Control)control);
         }
 
         public void disableAllControlsThisFrame()
         {
-            Game.DisableAllControlsThisFrame(0);
+            Game.DisableAllControlsThisFrame();
         }
 
         public float getControlNormal(int control)
         {
-            return Game.GetControlNormal(0, (GTA.Control) control);
+            return Game.GetControlValueNormalized((GTA.Control) control);
         }
 
         public float getDisabledControlNormal(int control)
         {
-            return Game.GetDisabledControlNormal(0, (GTA.Control)control);
+            return Game.GetDisabledControlValueNormalized((GTA.Control)control);
         }
 
         public void setControlNormal(int control, double value)
         {
-            Game.SetControlNormal(0, (GTA.Control)control, (float)value);
+            Game.SetControlValueNormalized((GTA.Control)control, (float)value);
         }
 
         public bool isChatOpen()
@@ -4326,19 +4330,19 @@ namespace GTANetwork.Javascript
 
         public void setTime(double hours, double minutes)
         {
-            World.CurrentDayTime = new TimeSpan((int) hours, (int) minutes, 00);
+            World.CurrentTimeOfDay = new TimeSpan((int) hours, (int) minutes, 00);
         }
 
         public TimeSpan getTime()
         {
-            return World.CurrentDayTime;
+            return World.CurrentTimeOfDay;
         }
         
         public void resetTime()
         {
             if (Main.Time != null)
             {
-                World.CurrentDayTime = Main.Time.Value;
+                World.CurrentTimeOfDay = Main.Time.Value;
             }
         }
 
@@ -4499,12 +4503,12 @@ namespace GTANetwork.Javascript
 
         public string getZoneName(Vector3 position)
         {
-            return World.GetZoneName(position.ToVector());
+            return World.GetZoneDisplayName(position.ToVector());
         }
 
         public string getZoneNameLabel(Vector3 position)
         {
-            return World.GetZoneNameLabel(position.ToVector());
+            return World.GetZoneLocalizedName(position.ToVector());
         }
 
         public float getGroundHeight(Vector3 position)

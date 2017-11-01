@@ -65,7 +65,7 @@ namespace NativeUI.PauseMenu
         {
             if (_sc == null)
             {
-                _sc = new Scaleform(0);
+                _sc = new Scaleform("0");
                 _sc.Load("instructional_buttons");
             }
 

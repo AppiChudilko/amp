@@ -367,7 +367,7 @@ namespace GTANetwork
                 var animDict = ((StringArgument)obj.Arguments[0]).Data;
 
                 Util.Util.LoadPtfxAsset(animDict);
-                Function.Call(Hash._SET_PTFX_ASSET_NEXT_CALL, animDict);
+                Function.Call(Hash._USE_PARTICLE_FX_ASSET_NEXT_CALL, animDict);
 
                 list.RemoveAt(0);
             }
@@ -454,10 +454,10 @@ namespace GTANetwork
 
             if (((int)nativeType & (int)Enums.NativeType.PlayerSkinChange) > 0)
             {
-                Ped PlayerChar = Game.Player.Character;
-                PlayerChar.SetDefaultClothes();
-                PlayerChar.MaxHealth = 200;
-                PlayerChar.Health = playerHealth;
+                Ped playerChar = Game.Player.Character;
+                playerChar.Style.SetDefaultClothes();
+                playerChar.MaxHealth = 200;
+                playerChar.Health = playerHealth;
             }
         }
 

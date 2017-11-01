@@ -71,9 +71,9 @@ namespace GTANetwork
                             Control.LookDown,
                         };
 
-                    Game.DisableAllControlsThisFrame(0);
+                    Game.DisableAllControlsThisFrame();
                     foreach (var c in exceptions)
-                        Game.EnableControlThisFrame(0, c);
+                        Game.EnableControlThisFrame(c);
 
                     var ent = NetEntityHandler.NetToEntity(SpectatingEntity);
 
@@ -110,7 +110,7 @@ namespace GTANetwork
                     PlayerChar.IsPositionFrozen = true;
                     Game.Player.IsInvincible = true;
                     PlayerChar.IsCollisionEnabled = false;
-                    Game.DisableAllControlsThisFrame(0);
+                    Game.DisableAllControlsThisFrame();
 
                     if (CurrentSpectatingPlayer.Character == null)
                         PlayerChar.PositionNoOffset = CurrentSpectatingPlayer.Position;
@@ -119,12 +119,12 @@ namespace GTANetwork
                     else
                         PlayerChar.PositionNoOffset = CurrentSpectatingPlayer.Character.Position;
 
-                    if (Game.IsControlJustPressed(0, Control.PhoneLeft))
+                    if (Game.IsControlJustPressed(Control.PhoneLeft))
                     {
                         _currentSpectatingPlayerIndex--;
                         CurrentSpectatingPlayer = null;
                     }
-                    else if (Game.IsControlJustPressed(0, Control.PhoneRight))
+                    else if (Game.IsControlJustPressed(Control.PhoneRight))
                     {
                         _currentSpectatingPlayerIndex++;
                         CurrentSpectatingPlayer = null;
@@ -134,12 +134,17 @@ namespace GTANetwork
                     {
                         var center = new Point((int)(res.Width / 2), (int)(res.Height / 2));
 
-                        new UIResText("Now spectating:~n~" + CurrentSpectatingPlayer.Name,
-                            new Point(center.X, (int)(res.Height - 200)), 0.4f, Color.White, GTA.UI.Font.ChaletLondon,
-                            UIResText.Alignment.Centered)
+                        new UIResText(
+                            "Now spectating:~n~" + CurrentSpectatingPlayer.Name,
+                            new Point(center.X, (int)(res.Height - 200)), 
+                            0.4f, 
+                            Color.White, 
+                            GTA.UI.Font.ChaletLondon,
+                            UIResText.Alignment.Centered
+                        )
                         {
                             Outline = true,
-                        }.Draw();
+                        }.Draw(new Size());
 
                         new Sprite("mparrow", "mp_arrowxlarge", new Point(center.X - 264, (int)(res.Height - 232)), new Size(64, 128), 180f, Color.White).Draw();
                         new Sprite("mparrow", "mp_arrowxlarge", new Point(center.X + 200, (int)(res.Height - 232)), new Size(64, 128)).Draw();

@@ -273,7 +273,7 @@ namespace GTANetwork
             _menuPool = new MenuPool();
             BuildMainMenu();
 
-            Function.Call(Hash._ENABLE_MP_DLC_MAPS, true); // _ENABLE_MP_DLC_MAPS
+            Function.Call(Hash._USE_FREEMODE_MAP_BEHAVIOR, true); // _ENABLE_MP_DLC_MAPS
             Function.Call(Hash._LOAD_MP_DLC_MAPS); // _LOAD_MP_DLC_MAPS / _USE_FREEMODE_MAP_BEHAVIOR
 
             MainMenuCamera = World.CreateCamera(new Vector3(-1394.834f, -791.787f, 25.5378f), new Vector3(), GameplayCamera.FieldOfView);
@@ -295,11 +295,11 @@ namespace GTANetwork
 
             //Function.Call(Hash.SHUTDOWN_LOADING_SCREEN);
 
-            Audio.SetAudioFlag(AudioFlag.LoadMPData, true);
-            Audio.SetAudioFlag(AudioFlag.DisableBarks, true);
-            Audio.SetAudioFlag(AudioFlag.DisableFlightMusic, true);
-            Audio.SetAudioFlag(AudioFlag.PoliceScannerDisabled, true);
-            Audio.SetAudioFlag(AudioFlag.OnlyAllowScriptTriggerPoliceScanner, true);
+            Audio.SetAudioFlag(AudioFlags.LoadMPData, true);
+            Audio.SetAudioFlag(AudioFlags.DisableBarks, true);
+            Audio.SetAudioFlag(AudioFlags.DisableFlightMusic, true);
+            Audio.SetAudioFlag(AudioFlags.PoliceScannerDisabled, true);
+            Audio.SetAudioFlag(AudioFlags.OnlyAllowScriptTriggerPoliceScanner, true);
             Function.Call((Hash)0x552369F549563AD5, false); //_FORCE_AMBIENT_SIREN
 
             GlobalVariable.Get(2576573).Write(1); //Enable MP cars?
@@ -503,7 +503,7 @@ namespace GTANetwork
                         }
                         else
                         {
-                            var message = Game.GetUserInput(255);
+                            var message = Game.GetUserInput();
                             if (string.IsNullOrEmpty(message)) break;
 
                             var obj = new ChatData { Message = message, };

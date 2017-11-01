@@ -23,17 +23,17 @@ namespace GTANetwork.Util
 
             ThreadJumper.Enqueue(delegate
             {
-                output = Game.GetUserInput(defaultText, maxLen);
+                output = Game.GetUserInput(WindowTitle.EnterMessage60, defaultText, maxLen);
             });
 
             Main.BlockControls = true;
 
-            Script.Yield();
+            Yield();
 
             while (output == null)
             {
                 spinner.Invoke();
-                Script.Yield();
+                Yield();
             }
             Main.BlockControls = false;
             return output;

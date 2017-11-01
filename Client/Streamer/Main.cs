@@ -1720,7 +1720,7 @@ namespace GTANetwork.Streamer
                             var data = (ILocalHandleable)item;
                             JavascriptHook.InvokeStreamOutEvent(new LocalHandle(data.LocalHandle), (int)EntityType.Blip);
                             var obj = new Blip(data.LocalHandle);
-                            if (obj.Exists()) obj.Remove();
+                            if (obj.Exists()) obj.Delete();
                         }
                         break;
                     case EntityType.Pickup:
@@ -1823,7 +1823,7 @@ namespace GTANetwork.Streamer
             veh.Mods.PearlescentColor = 0;
             veh.Mods.RimColor = 0;
             veh.EngineHealth = data.Health;
-            veh.SirenActive = data.Siren;
+            veh.IsSirenActive = data.Siren;
             veh.Mods.LicensePlate = data.NumberPlate;
             veh.Mods.WheelType = 0;
             veh.DirtLevel = data.DirtLevel;
@@ -1930,13 +1930,13 @@ namespace GTANetwork.Streamer
                 }
                 else
                 {
-                    veh.TaxiLightOn = true;
+                    veh.IsTaxiLightOn = true;
                 }
             }
             else
             {
-                veh.SearchLightOn = false;
-                veh.TaxiLightOn = false;
+                veh.IsSearchLightOn = false;
+                veh.IsTaxiLightOn = false;
             }
 
 
@@ -2005,7 +2005,7 @@ namespace GTANetwork.Streamer
             if ((object) data?.Position == null || (object)data.Rotation == null) return;
 
             Util.Util.LoadPtfxAsset(data.Library);
-            Function.Call(Hash._SET_PTFX_ASSET_NEXT_CALL, data.Library);
+            Function.Call(Hash._USE_PARTICLE_FX_ASSET_NEXT_CALL, data.Library);
 
             int handle;
 
@@ -2097,7 +2097,8 @@ namespace GTANetwork.Streamer
             if (!model.IsLoaded) Util.Util.LoadModel(model);
 
             Prop ourProp = null; 
-            if(model.IsLoaded) ourProp = new Prop(Function.Call<int>(Hash.CREATE_OBJECT_NO_OFFSET, model.Hash, data.Position.X, data.Position.Y, data.Position.Z, false, true, false));
+            //TODO
+            if(model.IsLoaded) ourProp = new Prop(Function.Call<int>(Hash.CREATE_OBJECT, model.Hash, data.Position.X, data.Position.Y, data.Position.Z, false, true, false));
             if (ourProp == null || !ourProp.Exists())
             {
                 data.StreamedIn = false;
@@ -2414,7 +2415,7 @@ namespace GTANetwork.Streamer
             {
                 TextAlignment = UIResText.Alignment.Centered,
                 Outline = true
-            }.Draw();
+            }.Draw(new Size());
             Function.Call(Hash.CLEAR_DRAW_ORIGIN);
         }
         #endregion

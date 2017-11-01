@@ -248,7 +248,7 @@ namespace GTANetwork.Streamer
                         try { File.Delete(CurrentFile.FilePath); }
                         catch { }
 
-                        Screen.ShowNotification("Disallowed file type: " + mime + "~n~" + CurrentFile.Filename);
+                        Notification.Show("Disallowed file type: " + mime + "~n~" + CurrentFile.Filename);
                     }
                 }
 

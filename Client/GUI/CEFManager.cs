@@ -58,7 +58,7 @@ namespace GTANetwork.GUI
             {
                 if (!CefUtil.DISABLE_CEF && ShowCursor)
                 {
-                    Game.DisableAllControlsThisFrame(0);
+                    Game.DisableAllControlsThisFrame();
 
                     var res = Main.screen;
                     var mouseX = Function.Call<float>(Hash.GET_DISABLED_CONTROL_NORMAL, 0, (int)GTA.Control.CursorX) * res.Width;
@@ -71,17 +71,17 @@ namespace GTANetwork.GUI
                         CEFManager._cursor.Location = new Point((int)mouseX, (int)mouseY);
                     }
 
+                    //TODO Maybe error IsDisabled old SVH
+                    var mouseDown = Game.IsEnabledControlJustPressed(GTA.Control.CursorAccept);
+                    var mouseDownRN = Game.IsEnabledControlJustPressed(GTA.Control.CursorAccept);
+                    var mouseUp = Game.IsEnabledControlJustPressed(GTA.Control.CursorAccept);
 
-                    var mouseDown = Game.IsDisabledControlJustPressed(0, GTA.Control.CursorAccept);
-                    var mouseDownRN = Game.IsDisabledControlPressed(0, GTA.Control.CursorAccept);
-                    var mouseUp = Game.IsDisabledControlJustReleased(0, GTA.Control.CursorAccept);
+                    var rmouseDown = Game.IsEnabledControlJustPressed(GTA.Control.CursorCancel);
+                    var rmouseDownRN = Game.IsEnabledControlJustPressed(GTA.Control.CursorCancel);
+                    var rmouseUp = Game.IsEnabledControlJustPressed(GTA.Control.CursorCancel);
 
-                    var rmouseDown = Game.IsDisabledControlJustPressed(0, GTA.Control.CursorCancel);
-                    var rmouseDownRN = Game.IsDisabledControlPressed(0, GTA.Control.CursorCancel);
-                    var rmouseUp = Game.IsDisabledControlJustReleased(0, GTA.Control.CursorCancel);
-
-                    var wumouseDown = Game.IsDisabledControlPressed(0, GTA.Control.CursorScrollUp);
-                    var wdmouseDown = Game.IsDisabledControlPressed(0, GTA.Control.CursorScrollDown);
+                    var wumouseDown = Game.IsEnabledControlJustPressed(GTA.Control.CursorScrollUp);
+                    var wdmouseDown = Game.IsEnabledControlJustPressed(GTA.Control.CursorScrollDown);
 
                     foreach (var browser in CEFManager.Browsers)
                     {

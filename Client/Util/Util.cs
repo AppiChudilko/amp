@@ -335,7 +335,7 @@ namespace GTANetwork.Util
             {
                 try
                 {
-                    GTA.UI.Screen.ShowNotification(msg);
+                    GTA.UI.Notification.Show(msg);
                 }
                 catch (Exception)
                 {
@@ -432,7 +432,7 @@ namespace GTANetwork.Util
         {
             for (int i = 0; i < length; i++)
             {
-                MemoryAccess.WriteByte(pointer + i, value);
+                GlobalVariable.GetByAddress(pointer + i).Write(value);
             }
         }
 
@@ -440,7 +440,7 @@ namespace GTANetwork.Util
         {
             for (int i = 0; i < value.Length; i++)
             {
-                MemoryAccess.WriteByte(pointer + i, value[i]);
+                GlobalVariable.GetByAddress(pointer + i).Write(value[i]);
             }
         }
 
@@ -449,7 +449,7 @@ namespace GTANetwork.Util
             byte[] memory = new byte[length];
             for (int i = 0; i < length; i++)
             {
-                memory[i] = MemoryAccess.ReadByte(pointer + i);
+                memory[i] = GlobalVariable.GetByAddress(pointer + i).Read<byte>();
             }
             return memory;
         }
@@ -469,9 +469,9 @@ namespace GTANetwork.Util
                     new IntPtr(
                         unchecked(
                             (long)
-                                MemoryAccess.FindPattern(
-                                    (sbyte*)patternPtr.ToPointer(),
-                                    (sbyte*)patternPtr.ToPointer()
+                                FindPattern(
+                                    patternPtr.ToString(),
+                                    maskPtr.ToString()
                                     )));
             }
             finally
@@ -498,11 +498,11 @@ namespace GTANetwork.Util
             float scaleX = txdWidth/width;
             float scaleY = txdHeight/height;
 
-            if (!centered)
+            /*if (!centered)
             {
                 reduceX += scaleX*0.5f;
                 reduceY += scaleY*0.5f;
-            }
+            }*/
 
             var cF = Function.Call<int>(Hash.GET_FRAME_COUNT);
 
@@ -511,12 +511,15 @@ namespace GTANetwork.Util
                 _idX = 0;
                 _lastframe = cF;
             }
-            
-            GTA.UI.CustomSprite.RawDraw(filename, 70,
-                new PointF(reduceX, reduceY),
+
+            var customSprite = new GTA.UI.CustomSprite(filename,
                 new SizeF(scaleX, scaleY / ratio),
-                new PointF(0.5f, 0.5f),
-                rot, Color.FromArgb(a, r, g, b));
+                new PointF(reduceX, reduceY),
+                Color.FromArgb(a, r, g, b),
+                rot,
+                centered);
+            
+            customSprite.Draw();
         }
 
         public static void DrawSprite(string dict, string txtName, double x, double y, double width, double height, double heading,
@@ -602,7 +605,7 @@ namespace GTANetwork.Util
                 thisCol.Call(Hash.SET_TEXT_WRAP, x, xsize);
             }
 
-            thisCol.Call(Hash._SET_TEXT_ENTRY, "CELL_EMAIL_BCON");
+            thisCol.Call(Hash.BEGIN_TEXT_COMMAND_DISPLAY_TEXT, "CELL_EMAIL_BCON");
 
             const int maxStringLength = 99;
 
@@ -614,7 +617,7 @@ namespace GTANetwork.Util
                 //Function.Call((Hash)0x6C188BE134E074AA, caption.Substring(i, System.Math.Min(maxStringLength, caption.Length - i)));
             }
 
-            thisCol.Call(Hash._DRAW_TEXT, x, y);
+            thisCol.Call(Hash.END_TEXT_COMMAND_DISPLAY_TEXT, x, y);
             if (localCollection)
             {
                 thisCol.Execute();

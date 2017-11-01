@@ -34,6 +34,11 @@ void ManagedInit()
 	LoaderData::TickMethods.Clear();
 	LoaderData::KeyboardMethods.Clear();
 
+	DateTime now = DateTime::Now;
+	System::IO::StreamWriter^ outfile = gcnew System::IO::StreamWriter("SVHDN-Debug.log");
+	outfile->Write(now + " - ManagedInit");
+	outfile->Close();
+
 	String ^directory = IO::Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location);
 
 	for each (String ^filename in IO::Directory::EnumerateFiles(directory, "ScriptHookVDotNet*.dll"))
@@ -48,6 +53,11 @@ void ManagedInit()
 			DeleteFile(path + ":Zone.Identifier");
 
 			assembly = Assembly::LoadFrom(path);
+
+			DateTime now = DateTime::Now;
+			System::IO::StreamWriter^ outfile = gcnew System::IO::StreamWriter("SVHDN-Debug.log");
+			outfile->Write(now + " - ManagedInit - " + filename);
+			outfile->Close();
 		}
 		catch (Exception ^ex)
 		{

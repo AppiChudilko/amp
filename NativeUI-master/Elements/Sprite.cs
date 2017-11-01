@@ -73,8 +73,8 @@ namespace NativeUI
             if (!Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, TextureDict))
                 Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, TextureDict, true);
 
-                int screenw = Game.ScreenResolution.Width;
-            int screenh = Game.ScreenResolution.Height;
+                int screenw = GTA.UI.Screen.Resolution.Width;
+            int screenh = GTA.UI.Screen.Resolution.Height;
             const float height = 1080f;
             float ratio = (float)screenw/screenh;
             var width = height*ratio;
@@ -93,8 +93,8 @@ namespace NativeUI
             if (!Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, dict))
                 Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, dict, true);
 
-            int screenw = Game.ScreenResolution.Width;
-            int screenh = Game.ScreenResolution.Height;
+            int screenw = GTA.UI.Screen.Resolution.Width;
+            int screenh = GTA.UI.Screen.Resolution.Height;
             const float height = 1080f;
             float ratio = (float)screenw / screenh;
             var width = height * ratio;
@@ -116,14 +116,14 @@ namespace NativeUI
         /// <param name="size"></param>
         public static void DrawTexture(string path, Point position, Size size, float rotation, Color color)
         {
-            int screenw = Game.ScreenResolution.Width;
-            int screenh = Game.ScreenResolution.Height;
+            int screenw = GTA.UI.Screen.Resolution.Width;
+            int screenh = GTA.UI.Screen.Resolution.Height;
             
             const float height = 1080f;
             float ratio = (float)screenw / screenh;
             float width = height * ratio;
             
-            float reduceX = UI.WIDTH / width;
+            float reduceX = GTA.UI.Screen.Width / width;
             float reduceY = UI.HEIGHT / height;
 
             
@@ -131,7 +131,7 @@ namespace NativeUI
             if (screenw == 1914 && screenh == 1052) //TODO: Fix this when ScriptHookVDotNet 1.2 comes out.
                 extra = new Point(15, 0);
 
-            UI.DrawTexture(path, 1, 1, 60,
+            GTA.UI.DrawTexture(path, 1, 1, 60,
                 new Point(Convert.ToInt32(position.X*reduceX) + extra.X, Convert.ToInt32(position.Y*reduceY) + extra.Y),
                 new PointF(0f, 0f), 
                 new Size(Convert.ToInt32(size.Width * reduceX), Convert.ToInt32(size.Height * reduceY)),
